@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roadjava.student.mapper.StudentMapper">
+
+    <insert id="insert">
+        insert into student(no,real_name,birth_day,phone,email)
+        values (#{no },#{realName},#{birthDay},#{phone},#{email})
+    </insert>
+
+    <update id="update">
+        update student
+        <set>
+            no = #{no},
+            real_name = #{realName},
+            birth_day = #{birthDay},
+            phone = #{phone},
+            email = #{email},
+            <if test='photoPath != null and photoPath != ""'>
+                photo_path = #{photoPath}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStudentByIds">
+        delete from student where id in
+        <foreach collection="list" item="oneId" separator="," open="(" close=")">
+            #{oneId}
+        </foreach>
+    </delete>
+
+    <sql id="whereComm">
+        <where>
+            <if test='realName != null and realName!=""'>
+                real_name like concat('%',#{realName},'%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="listStudentByPage" resultType="studentDO">
+        select * from student
+        <include refid="whereComm"/>
+        order by id desc
+         <if test='pageNow !=null'>
+             limit #{start },#{pageSize}
+         </if>
+    </select>
+    <select id="selectCount" resultType="long">
+        select count(*) from student
+        <include refid="whereComm"/>
+    </select>
+    
+    <select id="selectOne" resultType="studentDo">
+        select  * from student
+        <where>
+<!--            <if test='id != null'>-->
+<!--                id = #{id}-->
+<!--            </if>-->
+            <if test='no != null and no != ""'>
+                no = #{no}
+            </if>
+            <if test='phone != null and phone != ""'>
+                phone = #{phone}
+            </if>
+            <if test='email != null and email != ""'>
+                email = #{email}
+            </if>
+        </where>
+    </select>
+</mapper>
